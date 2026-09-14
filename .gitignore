@@ -1,0 +1,27 @@
+# Virtual environment
+venv/
+.venv/
+
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# IDE
+.idea/
+.vscode/
+
+# Data
+data/*.pdf
+*.db
+
+# Qdrant local storage
+qdrant_storage/
+
+# Logs
+*.log

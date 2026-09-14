@@ -1,0 +1,10 @@
+langgraph
+langchain
+langchain-ollama
+langchain-core
+langchain-text-splitters
+qdrant-client
+pypdf2
+python-dotenv
+langfuse
+requests
