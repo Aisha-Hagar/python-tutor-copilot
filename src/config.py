@@ -13,8 +13,9 @@ QDRANT_URL = os.getenv("QDRANT_URL")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY") or None
 COLLECTION_NAME = "Beginning_Programming_with_Python_For_Dummies.pdf"
 
-# Embedding model
+# Embedding model and LLM
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL")
+LLM_MODEL = os.getenv("LLM_MODEL")
 
 # Chunking parameters
 CHUNK_SIZE = 1000
