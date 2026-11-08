@@ -8,6 +8,7 @@ from langchain_core.messages import HumanMessage
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.graph import build_graph
+from src.observability import get_callback_handler
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -20,7 +21,14 @@ def run_cli():
     """Interactive CLI loop with persistent memory."""
     app = build_graph()
     thread_id = f"student-{uuid.uuid4().hex[:8]}"
-    config = {"configurable": {"thread_id": thread_id}}
+    handler = get_callback_handler()
+    config = {"configurable": {"thread_id": thread_id},
+              "callback": [handler],
+              "metadata":{
+                  "langfuse_session_id": thread_id,
+                  "langfuse_tags": ["python-tutor", "cli"]
+              },
+    }
 
     print(f"\nPython 101 Tutor Copilot (session: {thread_id})")
     print("Type your question, or 'quit' to exit.\n")

@@ -8,6 +8,8 @@ class TutorState(TypedDict):
     intent: str
     plan: str
     retrieved_context: str
+    draft: str
+    reflection: str
     reflection_passed: bool
     iterations: int
     final_answer: str

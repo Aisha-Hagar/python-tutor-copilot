@@ -11,11 +11,22 @@ load_dotenv(PROJECT_ROOT / ".env")
 # Qdrant configuration
 QDRANT_URL = os.getenv("QDRANT_URL")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY") or None
-COLLECTION_NAME = "Beginning_Programming_with_Python_For_Dummies.pdf"
+COLLECTION_NAME = os.getenv("COLLECTION_NAME")
+
+
+
+# Langfuse configuration
+LANGFUSE_SECRET_KEY = os.getenv("LANGFUSE_SECRET_KEY")
+LANGFUSE_PUBLIC_KEY = os.getenv("LANGFUSE_PUBLIC_KEY")
+LANGFUSE_BASE_URL = os.getenv("LANGFUSE_BASE_URL")
+
+
 
 # Embedding model and LLM
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL")
 LLM_MODEL = os.getenv("LLM_MODEL")
+OLLAMA_BASE_URL=os.getenv("OLLAMA_BASE_URL")
+OLLAMA_API_KEY=os.getenv("OLLAMA_API_KEY")
 
 # Chunking parameters
 CHUNK_SIZE = 1000

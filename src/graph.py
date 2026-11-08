@@ -10,7 +10,7 @@ from src.nodes import (
     planning_node,
     reflect_node,
     revise_node,
-    tools_node,
+    tools_node, retrieve_node,
 )
 from src.state import TutorState
 
@@ -56,6 +56,7 @@ def build_graph():
 
     # Nodes
     builder.add_node("planning", planning_node)
+    builder.add_node("retrieve", retrieve_node)
     builder.add_node("agent", agent_node)
     builder.add_node("tools", tools_node)
     builder.add_node("draft", draft_node)
@@ -65,7 +66,8 @@ def build_graph():
 
     # Entry point
     builder.add_edge(START, "planning")
-    builder.add_edge("planning", "agent")
+    builder.add_edge("planning", "retrieve")
+    builder.add_edge("retrieve", "agent")
 
     # Routing to tool
     builder.add_conditional_edges(

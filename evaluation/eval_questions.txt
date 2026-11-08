@@ -1,0 +1,5 @@
+What's the difference between a list and a tuple?
+How do I write a for loop in Python?
+Why is my code giving an IndentationError?
+What is a function, and how do I define one?
+Can you make me a 2-week study plan for learning loops?

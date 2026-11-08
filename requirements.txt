@@ -4,7 +4,7 @@ langchain-ollama
 langchain-core
 langchain-text-splitters
 qdrant-client
-pypdf2
+pypdf
 python-dotenv
 langfuse
 requests

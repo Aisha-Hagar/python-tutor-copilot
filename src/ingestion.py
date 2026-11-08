@@ -71,7 +71,9 @@ def get_qdrant_client() -> QdrantClient:
     Create a QdrantClient.
     """
     logger.info(f"Connecting to Qdrant at {config.QDRANT_URL}")
-    return QdrantClient(url=config.QDRANT_URL, api_key=config.QDRANT_API_KEY)
+    return QdrantClient(url=config.QDRANT_URL,
+                        api_key=config.QDRANT_API_KEY,
+                        timeout=120)
 
 def reset_collection(client: QdrantClient) -> None:
     """
@@ -93,10 +95,11 @@ def reset_collection(client: QdrantClient) -> None:
 
 def index_chunks(client: QdrantClient, chunks: list[dict], embeddings: OllamaEmbeddings) -> None:
     """
-    Embed each chunk and upsert into Qdrant.
+    Embed each chunk and upsert into Qdrant in small batches.
     Uses deterministic IDs so re-runs overwrite rather than duplicate.
     """
-    points = []
+    BATCH_SIZE = 100
+    batch = []
     for i, chunk in enumerate(chunks):
         vector = embeddings.embed_query(chunk["text"])
         if len(vector) != config.VECTOR_DIM:
@@ -105,7 +108,7 @@ def index_chunks(client: QdrantClient, chunks: list[dict], embeddings: OllamaEmb
                 f"but collection expects {config.VECTOR_DIM}."
             )
         point_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"chunk-{i}"))
-        points.append(
+        batch.append(
             PointStruct(
                 id=point_id,
                 vector=vector,
@@ -118,12 +121,12 @@ def index_chunks(client: QdrantClient, chunks: list[dict], embeddings: OllamaEmb
             )
         )
 
-        if(i+1)%20==0:
-            logger.info(f"Embedded {i+1}/{len(chunks)}: chunks.")
+        if len(batch) >= BATCH_SIZE or i==len(chunks)-1:
+            logger.info(f"Upserting batch of {len(batch)} points (chunk {i+1}/{len(chunks)}).")
+            client.upsert(collection_name=config.COLLECTION_NAME, points=batch)
+            batch = []
 
-    logger.info(f"Upserting {len(points)} points into Qdrant.")
-    client.upsert(collection_name=config.COLLECTION_NAME, points=points)
-    logger.info(f"Upserted {len(points)} points into Qdrant.")
+    logger.info("Upserted all batches.")
 
 
 def run_ingestion():

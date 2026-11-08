@@ -60,13 +60,10 @@ def retrieve_textbook(query: str, top_k: int = 3) -> str:
             return "NO_RESULTS: The textbook doesn't appear to cover this topic."
 
         parts = []
-        for h in hits:
+        for i, h in enumerate(hits, start=1):
             payload = h.payload or {}
             parts.append(
-                f"[Source: {payload.get("source", "unknown")} | "
-                f"page: {payload.get("page", "?")} | "
-                f"chunk: {payload.get("chunk_id", "?")}]\n"
-                f"{payload.get("text", "")}"
+                f"[S{i}, page {payload.get('page', '?')}]: {payload.get('text', '')}"
             )
         return "\n\n---\n\n".join(parts)
 
