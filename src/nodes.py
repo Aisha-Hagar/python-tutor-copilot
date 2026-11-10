@@ -13,6 +13,7 @@ from langchain_ollama import ChatOllama
 from src import config
 from src.tools import ALL_TOOLS
 from src import citations
+from src.sanitize import sanitize
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +57,7 @@ def planning_node(state: dict) -> dict:
     """
     logger.info("NODE: planning")
     question = _last_human_message(state)
-
+    logger.info("  question: %r", sanitize(question)[:120])
     prompt = f"""You are a Python 101 tutor. A student asked:
 
 {question}
@@ -357,7 +358,7 @@ FEEDBACK: <one sentence of specific improvement advice if FAIL>
 
     logger.info("  llm verdict: %s", "PASS" if llm_passed else "FAIL")
     logger.info("  combined verdict: %s", "PASS" if passed else "FAIL")
-    logger.info("  reflection text: %s", text.replace("\n", " | ")[:300])
+    logger.info("  reflection: %s", sanitize(text.replace("\n", " | "))[:200])
 
     return {"reflection": text, "reflection_passed": passed}
 

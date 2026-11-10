@@ -29,6 +29,19 @@ def get_callback_handler() -> CallbackHandler:
     return _handler
 
 
+def resolve_trace_id(handler) -> str | None:
+    """v3 exposes last_trace_id; v2 exposes get_trace_id()."""
+    tid = getattr(handler, "last_trace_id", None)
+    if tid:
+        return tid
+    if hasattr(handler, "get_trace_id"):
+        try:
+            return handler.get_trace_id()
+        except Exception:
+            return None
+    return None
+
+
 def score_trace(trace_id: str, name: str, value: float, comment: str = "") -> None:
     client = get_langfuse_client()
     client.create_score(

@@ -4,12 +4,15 @@ import uuid
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.stdout.reconfigure(encoding="utf-8")
+sys.stderr.reconfigure(encoding="utf-8")
 
 from langchain_core.messages import HumanMessage
 
 from src import citations
 from src.graph import build_graph
-from src.observability import get_callback_handler, get_langfuse_client, score_trace
+from src.scoring import deterministic_scores
+from src.observability import get_callback_handler, get_langfuse_client, resolve_trace_id, score_trace
 
 logging.basicConfig(
     level=logging.INFO,
@@ -28,32 +31,6 @@ def load_questions() -> list[str]:
         if line.strip() and not line.startswith("#")
     ]
 
-
-def deterministic_scores(result: dict) -> dict[str, float]:
-    """
-    Compute scores that are deterministic.
-    """
-    draft = result.get("draft", "") or ""
-    intent = result.get("intent", "")
-    requires_context = intent != "quiz_prep"
-    context = result.get("retrieved_context", "") or ""
-    grounded = 1.0 if (not requires_context or len(context) > 200) else 0.0
-    available = citations.extract_available_pages(context)
-    cited = citations.extract_cited_pages(draft)
-    invalid = [p for p in cited if p not in available]
-
-    if cited:
-        citation_validity = 1.0 if not invalid else 0.0
-    else:
-        citation_validity = 0.0
-
-    return {
-        "draft_length": float(len(draft)),
-        "has_citations": 1.0 if cited else 0.0,
-        "citation_validity": citation_validity,
-        "grounded_context_present": grounded,
-        "reflection_passed": 1.0 if result.get("reflection_passed") else 0.0,
-    }
 
 
 def main():
@@ -88,13 +65,7 @@ def main():
             print(f" ERROR: {e}\n")
             continue
 
-        #trace_id = handler.last_trace_id if hasattr(handler, "last_trace_id") else None
-        trace_id = None
-        if hasattr(handler, "last_trace_id"):
-            trace_id = handler.last_trace_id
-        elif hasattr(handler, "get_trace_id"):
-            trace_id = handler.get_trace_id
-
+        trace_id = resolve_trace_id(handler)
         scores = deterministic_scores(result)
         logger.info("Q%d: intent=%s, context_len=%d, cited=%s",
                     i,
