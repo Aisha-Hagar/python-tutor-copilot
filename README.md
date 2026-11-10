@@ -5,7 +5,7 @@ questions with textbook citations, reflection, and observability.
 
 ## What It Demonstrates
 
-- Agentic RAG: planning → retrieval → draft → reflection → revision → final
+- Agentic RAG: planning -> retrieval -> draft -> reflection -> revision -> final
 - Deterministic retrieval on the answer path
 - Citation resolution 
 - Reflection loop with a deterministic citation gate
